@@ -1,0 +1,14 @@
+dataBase:
+  port: 3306
+  password: password
+  name: iav2
+  ip: localhost
+
+logger:
+  level: debug
+  format: json
+  output: /var/log/myapp.log
+  prettyLog: true
+  stacktrace: false
+  outputPaths:
+    - stderr

@@ -1,0 +1,8 @@
+dataBase:
+  port: 3606
+
+logger:
+  level: debug
+  format: json
+  output: /var/log/myapp.log
+  prettyLog: true
