@@ -9,10 +9,26 @@ import (
 )
 
 var (
-	opsProcessed = promauto.NewCounter(prometheus.CounterOpts{
-		Name: "myapp_processed_ops_total",
-		Help: "The total number of processed events",
-	})
+	RequestCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "redirect",
+		Subsystem: "http",
+		Name:      "requests_total",
+		Help:      "redirect http requests total",
+	}, []string{"host"})
+
+	ResponseCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "redirect",
+		Subsystem: "http",
+		Name:      "response_total",
+		Help:      "response http requests total",
+	}, []string{"host"})
+
+	DigitalPathCounter = promauto.NewCounterVec(prometheus.CounterOpts{
+		Namespace: "redirect",
+		Subsystem: "http",
+		Name:      "requests_digital_path_total",
+		Help:      "redirect http requests digitalPath total",
+	}, []string{"host"})
 )
 
 func InitMetrics() {

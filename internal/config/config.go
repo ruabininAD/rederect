@@ -1,10 +1,14 @@
 package config
 
 import (
+	"github.com/joho/godotenv"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/yaml.v3"
+	"log"
 	"os"
+	"strconv"
+	"strings"
 )
 
 var Log *zap.Logger
@@ -31,8 +35,8 @@ type Config struct {
 }
 
 func Init() {
-	mustInitConfigFile()
-
+	//mustInitConfigFile()
+	mustInitEnvFile()
 	initLog()
 }
 
@@ -96,4 +100,26 @@ func initLog() {
 	Log = zap.Must(logConfig.Build())
 
 	Log.Debug("log init")
+}
+
+func mustInitEnvFile() {
+	// Загрузка переменных окружения из файла .env
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("Ошибка при загрузке файла .env: %s", err)
+	}
+	Cfg.Port = os.Getenv("APP_LISTEN_PORT")
+
+	Cfg.DB.Ip = os.Getenv("DATABASE_IP")
+	Cfg.DB.Port = os.Getenv("DATABASE_PORT")
+	Cfg.DB.NameDB = os.Getenv("DATABASE_NAME")
+	Cfg.DB.Password = os.Getenv("DATABASE_PASSWORD")
+
+	Cfg.Logger.Level = os.Getenv("LOGGER_LEVEL")
+	Cfg.Logger.OutputPaths = strings.Split(os.Getenv("LOGGER_OUTPUTPATHS"), ",")
+	Cfg.Logger.Pretty, _ = strconv.ParseBool(os.Getenv("LOGGER_PRETTYLOG")) //fixme
+	Cfg.Logger.Output = os.Getenv("LOGGER_OUTPUT")
+	Cfg.Logger.Format = os.Getenv("LOGGER_FORMAT")
+	Cfg.Logger.StackTrace, _ = strconv.ParseBool(os.Getenv("LOGGER_STACKTRACE"))
+
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -10,7 +9,6 @@ import (
 	"rederect/internal/storage"
 	"regexp"
 	"strings"
-	"sync"
 	//	"zap"
 	//"net/http"
 )
@@ -20,32 +18,27 @@ import (
 // .env
 // config
 
-var wg sync.WaitGroup
 var db storage.DB
 
 func main() {
 	config.Init()
-	wg.Add(1)
+
 	go metrics.InitMetrics()
 
 	db = &storage.MariaDBS{}
 	db.Connect()
 
-	wg.Add(1)
-	go f()
-	wg.Wait()
-}
-
-func f() {
-	http.HandleFunc("/g", getHandler)
-	http.HandleFunc("/u", updateHandler)
 	http.HandleFunc("/", redirectHandler)
+	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {}) //fixme
 	http.ListenAndServe(":"+config.Cfg.Port, nil)
+
 }
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("redirectHandler")
 	originalURL := r.URL
 	path := strings.TrimLeft(originalURL.Path, "/")
+	metrics.RequestCounter.WithLabelValues(r.Host).Inc()
 
 	// Получаем последний домен
 	domain, err := db.GetLast()
@@ -59,6 +52,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		config.Log.Fatal(err.Error()) //fixme
 	}
+	metrics.ResponseCounter.WithLabelValues(domain).Inc()
 
 	// Если весь путь - цифровой
 	if path != "" {
@@ -71,9 +65,11 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 			// То ищем новость с таким ID и формируем адрес
 			newPath, err := getNewsPath(path)
 			if err != nil {
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				http.Error(w, "news not found", http.StatusInternalServerError)
+				config.Log.Debug("news " + path + " not found")
 				return
 			}
+			metrics.DigitalPathCounter.WithLabelValues(domain).Inc()
 			path = newPath
 		}
 	}
@@ -93,12 +89,6 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getNewsPath(id string) (string, error) {
-	// Пример подключения к базе данных MySQL
-	db, err := sql.Open("mysql", "user:password@tcp(localhost:3306)/database_name")
-	if err != nil {
-		return "", err
-	}
-	defer db.Close()
 
 	// Проверка ID на соответствие формату
 	matched, err := regexp.MatchString(`^([0-9]){1,8}$`, id)
@@ -107,30 +97,12 @@ func getNewsPath(id string) (string, error) {
 	}
 	if matched {
 		// Выполнение запроса к базе данных для получения пути новости по ID
-		var newPath string
-		err := db.QueryRow("SELECT CONCAT(`cat_url`, '/', `item_url`) FROM `news_posts` "+
-			"LEFT JOIN `news_posts_cat` ON `news_posts_cat`.`cat_id` = `news_posts`.`item_cat` "+
-			"WHERE `item_id` = ?", id).Scan(&newPath)
+		newPath, err := db.PathId(id)
 		if err != nil {
 			return "", err
 		}
 		return newPath, nil
 	}
+	config.Log.Debug("Invalid news ID")
 	return "", fmt.Errorf("Invalid news ID")
-}
-
-func getHandler(w http.ResponseWriter, r *http.Request) {
-	lastDomain, err := db.GetLast()
-	if err != nil {
-		config.Log.Info("error updateHandler: " + err.Error())
-	}
-	println(lastDomain)
-}
-
-func updateHandler(w http.ResponseWriter, r *http.Request) {
-	err := db.Update(r.Host)
-	fmt.Println("update URL" + r.URL.String())
-	if err != nil {
-		config.Log.Info("error updateHandler: " + err.Error())
-	}
 }
