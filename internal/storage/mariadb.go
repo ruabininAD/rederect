@@ -5,6 +5,7 @@ import (
 	"errors"
 	_ "github.com/go-sql-driver/mysql"
 	"redirect/internal/config"
+	"time"
 )
 
 type MariaDBS struct {
@@ -39,16 +40,17 @@ func (m *MariaDBS) Update(domain string) error {
 
 func (m *MariaDBS) Connect() {
 	err := errors.New("")
-	// Подключение к базе данных
-	dataSourceName :=
-		"root:" + config.Cfg.DB.Password +
-			"@tcp(" + config.Cfg.DB.Ip + ":" + config.Cfg.DB.Port + ")" +
-			"/" + config.Cfg.DB.NameDB
-	m.db, err = sql.Open("mysql", dataSourceName)
+
+	m.db, err = sql.Open("mysql", config.Cfg.DspToDatabase)
 	if err != nil {
 		config.Log.Panic(err.Error())
 		panic(err.Error())
 	}
+
+	m.db.SetMaxIdleConns(50)
+	m.db.SetMaxOpenConns(250)
+	m.db.SetConnMaxLifetime(60 * time.Second)
+
 	// Проверка подключения
 	err = m.db.Ping()
 	if err != nil {

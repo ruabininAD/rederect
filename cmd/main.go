@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go.uber.org/zap"
+	"math"
 	"net/http"
 	"net/url"
 	"redirect/internal/config"
@@ -11,14 +12,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	//	"zap"
-	//"net/http"
+	"time"
 )
-
-// zap
-// net/http
-// .env
-// config
 
 var db storage.DB
 var (
@@ -29,23 +24,30 @@ var (
 func main() {
 
 	config.Init()
-	config.Log.Info("run redirect",
-		zap.String("Version", Version),
-		zap.String("Build", Build))
+	config.Log.Info("run redirect", zap.String("Version", Version), zap.String("Build", Build))
 
 	go metrics.InitMetrics()
 
 	db = &storage.MariaDBS{}
 	db.Connect()
 
-	http.HandleFunc("/", redirectHandler)
-	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {}) //fixme
+	http.HandleFunc("/", measureTime(redirectHandler))
+	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {})
 	err := http.ListenAndServe(":"+config.Cfg.Port, nil)
 	if err != nil {
 		config.Log.Fatal(err.Error())
 		return
 	}
 
+}
+
+func measureTime(f func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		f(w, r)
+		elapsed := time.Since(start)
+		metrics.ResponseTimeHistogram.WithLabelValues(r.Host).Observe(float64(elapsed) / math.Pow(10, 6))
+	}
 }
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {

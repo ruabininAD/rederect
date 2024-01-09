@@ -15,19 +15,15 @@ var Log *zap.Logger
 var Cfg Config
 
 type Config struct {
-	DB struct {
-		Port     string `yaml:"port"`
-		Password string `yaml:"password"`
-		NameDB   string `yaml:"name"`
-		Ip       string `yaml:"ip"`
-	} `yaml:"dataBase"`
+	DspToDatabase string `yaml:"dsp_to_database"`
 
 	Logger struct {
-		Pretty      bool     `yaml:"prettyLog"`
-		Format      string   `yaml:"format"`
-		Level       string   `yaml:"level"`
-		Output      string   `yaml:"output"`
-		StackTrace  bool     `yaml:"stacktrace"`
+		Pretty     bool   `yaml:"prettyLog"`
+		Format     string `yaml:"format"`
+		Level      string `yaml:"level"`
+		Output     string `yaml:"output"`
+		StackTrace bool   `yaml:"stacktrace"`
+
 		OutputPaths []string `yaml:"outputPaths"`
 	} `yaml:"logger"`
 
@@ -110,10 +106,7 @@ func mustInitEnvFile() {
 	}
 	Cfg.Port = os.Getenv("APP_LISTEN_PORT")
 
-	Cfg.DB.Ip = os.Getenv("DATABASE_IP")
-	Cfg.DB.Port = os.Getenv("DATABASE_PORT")
-	Cfg.DB.NameDB = os.Getenv("DATABASE_NAME")
-	Cfg.DB.Password = os.Getenv("DATABASE_PASSWORD")
+	Cfg.DspToDatabase = os.Getenv("DSP_TO_DATABASE")
 
 	Cfg.Logger.Level = os.Getenv("LOGGER_LEVEL")
 	Cfg.Logger.OutputPaths = strings.Split(os.Getenv("LOGGER_OUTPUTPATHS"), ",")

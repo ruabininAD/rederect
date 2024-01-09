@@ -29,6 +29,17 @@ var (
 		Name:      "requests_digital_path_total",
 		Help:      "redirect http requests digitalPath total",
 	}, []string{"host", "code"})
+
+	ResponseTimeHistogram = promauto.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Namespace: "redirect",
+			Subsystem: "http",
+			Name:      "request_duration_milliseconds",
+			Help:      "redirect http request duration (ms)",
+			Buckets: []float64{
+				2, 6, 10, 14, 18, 22, 26, 30,
+			},
+		}, []string{"host"})
 )
 
 func InitMetrics() {

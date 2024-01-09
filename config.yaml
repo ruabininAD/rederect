@@ -1,8 +1,4 @@
-dataBase:
-  port: 3306
-  password: password
-  name: iav2
-  ip: localhost
+dsp_to_database: root:password@tcp(localhost:3307)/iav2
 
 logger:
   level: debug
@@ -15,3 +11,6 @@ logger:
 
 
 port: 8082
+
+#db user
+#
