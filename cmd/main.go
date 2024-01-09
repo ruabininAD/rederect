@@ -5,9 +5,9 @@ import (
 	"go.uber.org/zap"
 	"net/http"
 	"net/url"
-	"rederect/internal/config"
-	"rederect/internal/metrics"
-	"rederect/internal/storage"
+	"redirect/internal/config"
+	"redirect/internal/metrics"
+	"redirect/internal/storage"
 	"regexp"
 	"strconv"
 	"strings"
@@ -40,7 +40,11 @@ func main() {
 
 	http.HandleFunc("/", redirectHandler)
 	http.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {}) //fixme
-	http.ListenAndServe(":"+config.Cfg.Port, nil)
+	err := http.ListenAndServe(":"+config.Cfg.Port, nil)
+	if err != nil {
+		config.Log.Fatal(err.Error())
+		return
+	}
 
 }
 

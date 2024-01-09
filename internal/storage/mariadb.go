@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	_ "github.com/go-sql-driver/mysql"
-	"rederect/internal/config"
+	"redirect/internal/config"
 )
 
 type MariaDBS struct {

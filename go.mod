@@ -1,4 +1,4 @@
-module rederect
+module redirect
 
 go 1.18
 

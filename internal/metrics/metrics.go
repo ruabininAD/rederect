@@ -5,7 +5,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
-	"rederect/internal/config"
+	"redirect/internal/config"
 )
 
 var (
@@ -36,5 +36,9 @@ func InitMetrics() {
 	config.Log.Debug("prometheus metrics init")
 
 	http.Handle("/metrics", promhttp.Handler())
-	http.ListenAndServe(":2112", nil)
+	err := http.ListenAndServe(":2112", nil)
+	if err != nil {
+		config.Log.Warn(err.Error())
+		return
+	}
 }
