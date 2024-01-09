@@ -26,6 +26,8 @@ type Config struct {
 		StackTrace  bool     `yaml:"stacktrace"`
 		OutputPaths []string `yaml:"outputPaths"`
 	} `yaml:"logger"`
+
+	Port string `yaml:"port"`
 }
 
 func Init() {

@@ -12,3 +12,6 @@ logger:
   stacktrace: false
   outputPaths:
     - stderr
+
+
+port: 8082
