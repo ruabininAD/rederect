@@ -16,21 +16,12 @@ func (m *MariaDBS) GetLast() (string, error) {
 	var domainReds string
 	var domainStart string
 
-	//query := "SELECT `domain_name`, `domain_reds`,  `domain_start` FROM `domains` WHERE `domain_locale` = 'ru' AND `domain_type` = 'news' ORDER BY `domain_accept_redirect` DESC, `domain_start` DESC LIMIT 1"
-
-	//lomaetsa
-	//query := "SELECT `domain_name`, `domain_reds`, `domain_start` \nFROM `domains` \nWHERE `domain_locale` = 'ru' \nAND `domain_type` = 'news' \nAND `domain_reds` < 100 \nAND `domain_start` >= DATE_SUB(NOW(), INTERVAL 24 HOUR) \nORDER BY `domain_accept_redirect` DESC, `domain_start` DESC \nLIMIT 1"
-
-	query := "SELECT `domain_name`, `domain_reds`,  `domain_start` FROM `domains` WHERE `domain_locale` = 'ru' AND `domain_type` = 'news' ORDER BY `domain_accept_redirect` DESC, domain_reds "
+	query := "SELECT `domain_name`, `domain_reds`,  `domain_start` FROM `domains` WHERE `domain_locale` = 'ru' AND `domain_type` = 'news' ORDER BY `domain_accept_redirect` DESC, domain_reds  LIMIT 1"
 	err := m.db.QueryRow(query).Scan(&domain, &domainReds, &domainStart)
 	if err != nil {
 		return "", err
 	}
 
-	//
-	//if now-domainStart < 24h && domainReds >1000000 {
-	//
-	//}
 	return domain, nil
 
 }
@@ -70,9 +61,7 @@ func (m *MariaDBS) Connect() {
 
 func (m *MariaDBS) PathId(id string) (string, error) {
 	var newPath string
-	err := m.db.QueryRow("SELECT CONCAT(`cat_url`, '/', `item_url`) FROM `news_posts` "+
-		"LEFT JOIN `news_posts_cat` ON `news_posts_cat`.`cat_id` = `news_posts`.`item_cat` "+
-		"WHERE `item_id` = ?", id).Scan(&newPath)
+	err := m.db.QueryRow("SELECT CONCAT(`cat_url`, '/', `item_url`) FROM `news_posts` LEFT JOIN `news_posts_cat` ON `news_posts_cat`.`cat_id` = `news_posts`.`item_cat` WHERE `item_id` = ?", id).Scan(&newPath)
 
 	return newPath, err
 }

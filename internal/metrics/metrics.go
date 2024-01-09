@@ -28,7 +28,7 @@ var (
 		Subsystem: "http",
 		Name:      "requests_digital_path_total",
 		Help:      "redirect http requests digitalPath total",
-	}, []string{"host"})
+	}, []string{"host", "code"})
 )
 
 func InitMetrics() {
