@@ -20,7 +20,7 @@ type Config struct {
 	Service       string `yaml:"service"`
 	Port          string `yaml:"port"`
 	DspToDatabase string `yaml:"dsp_to_database"`
-	MetricPort    string `yaml:"metricPort"`
+	MetricPort    string `yaml:"prometheusMetricPort"`
 	Logger        struct {
 		Pretty     bool   `yaml:"prettyLog"`
 		Format     string `yaml:"format"`
@@ -40,13 +40,11 @@ func Init() {
 }
 
 func mustInitConfigFile() {
-	// Чтение файла конфигурации
 	data, err := os.ReadFile("config.yaml")
 	if err != nil {
 		Log.Panic("Ошибка чтения файла конфигурации:" + err.Error())
 	}
 
-	// Разбор YAML и запись в структуру
 	err = yaml.Unmarshal(data, &Cfg)
 	if err != nil {
 		Log.Panic("Ошибка разбора YAML: " + err.Error())
@@ -54,10 +52,10 @@ func mustInitConfigFile() {
 }
 
 func mustInitEnvFile() {
-	// Загрузка переменных окружения из файла .env
+
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Ошибка при загрузке файла .env: %s", err)
+		log.Fatalf("error load  .env file: %s", err)
 	}
 
 	Cfg.Port = os.Getenv("APP_LISTEN_PORT")
@@ -67,7 +65,8 @@ func mustInitEnvFile() {
 	Cfg.Logger.Output = os.Getenv("LOGGER_OUTPUT")
 	Cfg.Logger.Format = os.Getenv("LOGGER_FORMAT")
 	Cfg.Service = os.Getenv("SERVICE")
-	Cfg.MetricPort = os.Getenv("METRICS_PORT")
+	Cfg.MetricPort = os.Getenv("PROMETHEUS_METRIC_PORT")
+
 	Cfg.Logger.Pretty, err = strconv.ParseBool(os.Getenv("LOGGER_PRETTYLOG"))
 	if err != nil {
 		log.Fatalf("error parse LOGGER_PRETTYLOG .env: %s", err)

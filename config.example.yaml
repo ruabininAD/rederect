@@ -11,4 +11,4 @@ logger:
 
 
 port: 8082
-metricPort: 2112
+prometheusPort: 2112

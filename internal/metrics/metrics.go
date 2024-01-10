@@ -20,7 +20,7 @@ var (
 		Namespace: "redirect",
 		Subsystem: "http",
 		Name:      "response_total",
-		Help:      "response http requests total",
+		Help:      "redirect http response total",
 	}, []string{"host"})
 
 	ResponseTimeHistogram = promauto.NewHistogramVec(
