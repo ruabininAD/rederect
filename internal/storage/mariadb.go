@@ -17,7 +17,8 @@ func (m *MariaDBS) GetLast() (string, error) {
 	var domainReds string
 	var domainStart string
 
-	query := "SELECT `domain_name`, `domain_reds`,  `domain_start` FROM `domains` WHERE `domain_locale` = 'ru' AND `domain_type` = 'news' ORDER BY `domain_accept_redirect` DESC, domain_reds  LIMIT 1"
+	query := "SELECT `domain_name`, `domain_reds`,  `domain_start` FROM `domains` WHERE `domain_locale` = 'ru' AND `domain_type` = 'news' ORDER BY `domain_accept_redirect` DESC, `domain_start` DESC  LIMIT 1"
+
 	err := m.db.QueryRow(query).Scan(&domain, &domainReds, &domainStart)
 	if err != nil {
 		return "", err

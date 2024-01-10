@@ -1,4 +1,5 @@
 dsp_to_database: root:password@tcp(localhost:3307)/iav2
+service: redirect
 
 logger:
   level: debug
@@ -11,4 +12,5 @@ logger:
 
 
 port: 8082
+metricPort: 2112
 

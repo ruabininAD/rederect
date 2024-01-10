@@ -23,13 +23,6 @@ var (
 		Help:      "response http requests total",
 	}, []string{"host"})
 
-	DigitalPathCounter = promauto.NewCounterVec(prometheus.CounterOpts{
-		Namespace: "redirect",
-		Subsystem: "http",
-		Name:      "requests_digital_path_total",
-		Help:      "redirect http requests digitalPath total",
-	}, []string{"host", "code"})
-
 	ResponseTimeHistogram = promauto.NewHistogramVec(
 		prometheus.HistogramOpts{
 			Namespace: "redirect",
@@ -44,10 +37,10 @@ var (
 
 func InitMetrics() {
 
-	config.Log.Debug("prometheus metrics init")
+	config.Log.Debug("prometheus metrics init http://localhost:" + config.Cfg.MetricPort + "/metrics")
 
 	http.Handle("/metrics", promhttp.Handler())
-	err := http.ListenAndServe(":2112", nil)
+	err := http.ListenAndServe(":"+config.Cfg.MetricPort, nil)
 	if err != nil {
 		config.Log.Warn(err.Error())
 		return
