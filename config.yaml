@@ -7,7 +7,7 @@ logger:
   prettyLog: true
   stacktrace: false
   outputPaths:
-    - stderr
+    - stdout
 
 
 port: 8082
