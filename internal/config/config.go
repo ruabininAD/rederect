@@ -29,7 +29,7 @@ type Config struct {
 }
 
 func Init() {
-	mustInitConfigFile()
+	//mustInitConfigFile()
 	mustInitEnvFile()
 	initLog()
 	tracerInit()
@@ -49,7 +49,7 @@ func mustInitConfigFile() {
 
 func mustInitEnvFile() {
 
-	err := godotenv.Load()
+	err := godotenv.Load("/home/a/GolandProjects/redirect/.env")
 	if err != nil {
 		log.Fatalf("error load  .env file: %s", err)
 	}

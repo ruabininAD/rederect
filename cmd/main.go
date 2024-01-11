@@ -22,7 +22,7 @@ var (
 func main() {
 
 	config.Init()
-	config.Log.Info("run redirect", zap.String("Version", Version), zap.String("Build", Build))
+	config.Log.Info("run redirect", zap.String("Version", Version), zap.String("Build", Build), zap.String("Port", config.Cfg.Port))
 
 	go metrics.InitMetrics()
 
