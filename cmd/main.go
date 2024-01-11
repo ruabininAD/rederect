@@ -60,13 +60,13 @@ func redirectHandler(w http.ResponseWriter, r *http.Request) {
 	domain, err := db.GetLast()
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		config.Log.Fatal(err.Error()) //fixme
+		config.Log.Fatal(err.Error())
 	}
 	// Обновляем инфу о домене в списках доменов
 	err = db.Update(domain)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		config.Log.Fatal(err.Error()) //fixme
+		config.Log.Fatal(err.Error())
 	}
 
 	newUrl := url.URL{
