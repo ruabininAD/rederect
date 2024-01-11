@@ -10,7 +10,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"strings"
 )
 
 var Log *zap.Logger
@@ -25,29 +24,26 @@ type Config struct {
 		Pretty     bool   `yaml:"prettyLog"`
 		Format     string `yaml:"format"`
 		Level      string `yaml:"level"`
-		Output     string `yaml:"output"`
 		StackTrace bool   `yaml:"stacktrace"`
-
-		OutputPaths []string `yaml:"outputPaths"`
 	} `yaml:"logger"`
 }
 
 func Init() {
-	//mustInitConfigFile()
+	mustInitConfigFile()
 	mustInitEnvFile()
 	initLog()
 	tracerInit()
 }
 
 func mustInitConfigFile() {
-	data, err := os.ReadFile("config.yaml")
+	data, err := os.ReadFile("config.yaml") //config.yaml
 	if err != nil {
-		Log.Panic("Ошибка чтения файла конфигурации:" + err.Error())
+		Log.Panic("error load config.yaml file :" + err.Error())
 	}
 
 	err = yaml.Unmarshal(data, &Cfg)
 	if err != nil {
-		Log.Panic("Ошибка разбора YAML: " + err.Error())
+		Log.Panic("error parse YAML: " + err.Error())
 	}
 }
 
@@ -61,8 +57,6 @@ func mustInitEnvFile() {
 	Cfg.Port = os.Getenv("APP_LISTEN_PORT")
 	Cfg.DspToDatabase = os.Getenv("DSP_TO_DATABASE")
 	Cfg.Logger.Level = os.Getenv("LOGGER_LEVEL")
-	Cfg.Logger.OutputPaths = strings.Split(os.Getenv("LOGGER_OUTPUTPATHS"), ",")
-	Cfg.Logger.Output = os.Getenv("LOGGER_OUTPUT")
 	Cfg.Logger.Format = os.Getenv("LOGGER_FORMAT")
 	Cfg.Service = os.Getenv("SERVICE")
 	Cfg.MetricPort = os.Getenv("PROMETHEUS_METRIC_PORT")
@@ -109,6 +103,7 @@ func initLog() {
 	if Cfg.Logger.Pretty {
 		encoding = "console"
 		encoderCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
+		encoderCfg.EncodeTime = zapcore.RFC3339TimeEncoder
 	}
 
 	logConfig := zap.Config{
@@ -119,8 +114,8 @@ func initLog() {
 		Sampling:          nil,
 		Encoding:          encoding,
 		EncoderConfig:     encoderCfg,
-		OutputPaths:       Cfg.Logger.OutputPaths,
-		ErrorOutputPaths:  Cfg.Logger.OutputPaths,
+		OutputPaths:       []string{"stdout"},
+		ErrorOutputPaths:  []string{"stdout"},
 		InitialFields:     map[string]interface{}{},
 	}
 	Log = zap.Must(logConfig.Build())
